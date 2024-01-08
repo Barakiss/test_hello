@@ -1,0 +1,42 @@
+pipeline {
+
+    environment {
+    dockerimagename = "monserveurphp"
+    dockerImage = ""
+    }
+
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/Barakiss/test_hello.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dockerImage = docker.build dockerimagename
+            }
+        }
+
+	    stage('Pushing Image') {
+	    environment {
+                registryCredential = 'barakiss'
+                    
+                }
+           
+        steps {
+            script {
+                docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+                    dockerImage.push("latest")
+                }
+                    
+                }
+            }
+        }
+
+       
+    }
+}
+
